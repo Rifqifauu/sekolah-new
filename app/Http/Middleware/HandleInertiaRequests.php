@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Setting; // 👈 Wajib di-import biar gak error Class Not Found
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -41,6 +42,15 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+
+            // 💡 Tambahkan di sini bro
+            'globalSettings' => function () {
+                try {
+                    return Setting::all()->pluck('value', 'key')->toArray();
+                } catch (\Exception $e) {
+                    return [];
+                }
+            },
         ];
     }
 }

@@ -6,25 +6,35 @@
             >
                 <div class="flex items-center space-x-6">
                     <a
-                        href="mailto:info@sman1.sch.id"
+                        :href="`mailto:${globalSettings?.site_email ?? 'info@sekolah.sch.id'}`"
                         class="flex items-center gap-2 transition-colors hover:text-blue-300"
                     >
                         <i class="fa-solid fa-envelope"></i>
-                        <span class="hidden sm:inline"
-                            >info@smp1jelbuk.sch.id</span
-                        >
+                        <span class="hidden sm:inline">
+                            {{
+                                globalSettings?.site_email ??
+                                'info@sekolah.sch.id'
+                            }}
+                        </span>
                     </a>
                     <a
-                        href="tel:+62211234567"
+                        :href="`tel:${globalSettings?.site_phone ?? ''}`"
                         class="flex items-center gap-2 transition-colors hover:text-blue-300"
                     >
                         <i class="fa-solid fa-phone"></i>
-                        <span>(021) 1234567</span>
+                        <span>{{
+                            globalSettings?.site_phone ?? '(021) 1234567'
+                        }}</span>
                     </a>
                 </div>
                 <div class="hidden items-center text-blue-200 md:flex">
                     <i class="fa-solid fa-location-dot mr-2"></i>
-                    <span>Jalan Pendidikan No. 123, Jakarta, Indonesia</span>
+                    <span class="line-clamp-1">
+                        {{
+                            globalSettings?.site_address ??
+                            'Jalan Pendidikan No. 123, Indonesia'
+                        }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -37,21 +47,43 @@
                     <div class="flex flex-shrink-0 items-center">
                         <a href="/" class="group flex items-center gap-3">
                             <div
+                                v-if="globalSettings?.school_logo"
+                                class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl transition-transform group-hover:scale-105"
+                            >
+                                <img
+                                    :src="
+                                        getImageUrl(globalSettings.school_logo)
+                                    "
+                                    :alt="globalSettings?.school_name"
+                                    class="h-full w-full object-contain"
+                                />
+                            </div>
+                            <div
+                                v-else
                                 class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-700 to-blue-900 shadow-lg shadow-blue-900/20 transition-transform group-hover:scale-105"
                             >
                                 <i
                                     class="fa-solid fa-school text-xl text-white"
                                 ></i>
                             </div>
+
                             <div class="flex flex-col">
                                 <span
-                                    class="text-xl font-bold tracking-wide text-gray-900"
+                                    class="line-clamp-1 text-lg font-bold tracking-wide text-gray-900 sm:text-xl"
                                 >
-                                    SMP Negeri 1 Jelbuk
+                                    {{
+                                        globalSettings?.school_name ??
+                                        'SMP Negeri Default'
+                                    }}
                                 </span>
-                                <span class="text-xs font-medium text-blue-600"
-                                    >Maju & Berprestasi</span
+                                <span
+                                    class="line-clamp-1 text-xs font-medium text-blue-600"
                                 >
+                                    {{
+                                        globalSettings?.school_slogan ??
+                                        'Maju & Berprestasi'
+                                    }}
+                                </span>
                             </div>
                         </a>
                     </div>
@@ -188,11 +220,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { usePage } from '@inertiajs/vue3'; // 👈 Import Inertia hook
 
 const isMenuOpen = ref(false);
 
-// Optional: Close mobile menu when window is resized to desktop
+// 💡 Tangkap global shared props dari Inertia
+const page = usePage();
+const globalSettings = computed(() => page.props.globalSettings);
+
+// 💡 Helper membaca path Storage Laravel untuk Logo
+const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    return `/storage/${path}`;
+};
+
 const handleResize = () => {
     if (window.innerWidth >= 1024 && isMenuOpen.value) {
         isMenuOpen.value = false;
@@ -208,12 +251,9 @@ onUnmounted(() => {
 });
 
 const menuItems = [
+    { label: 'Beranda', href: '/' },
     {
-        label: 'Beranda',
-        href: '/',
-    },
-    {
-        label: 'Tentang Kami', // Menggantikan 'Profil' agar lebih luas maknanya
+        label: 'Tentang Kami',
         href: '#',
         subItems: [
             { label: 'Sejarah Sekolah', href: '/profil/sejarah' },
@@ -221,7 +261,7 @@ const menuItems = [
         ],
     },
     {
-        label: 'Kepegawaian', // Atau bisa pakai nama 'Direktori' / 'Kepegawaian'
+        label: 'Kepegawaian',
         href: '#',
         subItems: [
             { label: 'Data Guru', href: '/sivitas/data-guru' },
@@ -233,12 +273,12 @@ const menuItems = [
         href: '#',
         subItems: [
             { label: 'Ekstrakurikuler', href: '/kesiswaan/ekstrakurikuler' },
-            { label: 'Prestasi Siswa', href: '/kesiswaan/prestasi' }, // Tambahan ide bagus untuk sekolah
-            { label: 'Fasilitas', href: '/kesiswaan/fasilitas' }, // Tambahan opsional
+            { label: 'Prestasi Siswa', href: '/kesiswaan/prestasi' },
+            { label: 'Fasilitas', href: '/kesiswaan/fasilitas' },
         ],
     },
     {
-        label: 'Pusat Informasi', // Menggabungkan semua konten dinamis
+        label: 'Pusat Informasi',
         href: '#',
         subItems: [
             { label: 'Pengumuman', href: '/pengumuman' },
@@ -246,11 +286,7 @@ const menuItems = [
             { label: 'Galeri Kegiatan', href: '/galeri' },
         ],
     },
-    {
-        label: 'Hubungi Kami',
-        href: '/contact',
-        isPrimary: true,
-    },
+    { label: 'Hubungi Kami', href: '/contact', isPrimary: true },
 ];
 
 const toggleMenu = () => {

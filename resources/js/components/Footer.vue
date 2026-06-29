@@ -15,7 +15,7 @@
                             <span
                                 class="text-xl font-bold tracking-wide text-white"
                             >
-                                SMP Negeri 1 Jelbuk
+                                SMP Negeri 1 Lorem Ipsum
                             </span>
                             <span class="text-xs font-medium text-blue-300">
                                 Maju & Berprestasi
@@ -87,10 +87,10 @@
                         <li class="flex items-center gap-3">
                             <i class="fa-solid fa-envelope text-blue-500"></i>
                             <a
-                                href="mailto:info@smp1jelbuk.sch.id"
+                                href="mailto:info@smp1Lorem Ipsum.sch.id"
                                 class="transition-colors hover:text-white"
                             >
-                                info@smpn1jelbuk.sch.id
+                                info@smpn1Lorem Ipsum.sch.id
                             </a>
                         </li>
                     </ul>
@@ -123,7 +123,7 @@
                 class="flex flex-col items-center justify-between gap-4 md:flex-row"
             >
                 <p class="text-center text-sm text-blue-300 md:text-left">
-                    &copy; {{ currentYear }} SMP Negeri 1 Jelbuk. Hak Cipta
+                    &copy; {{ currentYear }} SMP Negeri 1 Lorem Ipsum. Hak Cipta
                     Dilindungi Undang-Undang.
                 </p>
                 <div class="flex items-center gap-4 text-sm text-blue-300">

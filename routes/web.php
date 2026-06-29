@@ -26,7 +26,8 @@ Route::get('/kesiswaan/ekstrakurikuler', [SiteController::class, 'extra'])->name
 Route::get('/pengumuman', [SiteController::class, 'announcement'])->name('announcement.index');
 Route::get('/artikel', [SiteController::class, 'article'])->name('article.index');
 Route::get('/galeri', [SiteController::class, 'media'])->name('media.index');
-
+Route::get('/pengumuman/{slug}', [SiteController::class, 'detailPengumuman'])->name('announcement.show');
+Route::get('/artikel/{slug}', [SiteController::class, 'detailArtikel'])->name('article.show');
 
 // ==========================================
 // 2. RUTE STATIS (Langsung Render Inertia)
@@ -35,9 +36,11 @@ Route::get('/galeri', [SiteController::class, 'media'])->name('media.index');
 Route::inertia('/profil/sejarah', 'Profil/Sejarah')->name('profil.sejarah');
 Route::inertia('/profil/visi-misi', 'Profil/VisiMisi')->name('profil.visi-misi');
 
-// Kesiswaan (Diasumsikan statis, namun bisa diubah ke controller nanti jika Anda membuat tabel database khusus untuk Fasilitas/Prestasi)
-Route::inertia('/kesiswaan/prestasi', 'Kesiswaan/Prestasi')->name('prestasi.index');
-Route::inertia('/kesiswaan/fasilitas', 'Kesiswaan/Fasilitas')->name('fasilitas.index');
+// --- UBAH BAGIAN INI ---
+// Sebelumnya menggunakan Route::inertia, sekarang gunakan Route::get ke SiteController
+Route::get('/kesiswaan/prestasi', [SiteController::class, 'achievement'])->name('prestasi.index');
+Route::get('/kesiswaan/fasilitas', [SiteController::class, 'fasilitas'])->name('fasilitas.index');
+// -----------------------
 
 // Halaman Kontak
-Route::inertia('/contact', 'Contact/Index')->name('contact.index');
+Route::inertia('/contact', 'Contact')->name('contact.index');

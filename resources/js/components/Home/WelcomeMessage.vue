@@ -36,7 +36,7 @@
                                 Drs. Budi Santoso, M.Pd.
                             </h3>
                             <p class="mt-1 text-sm font-medium text-blue-200">
-                                Kepala SMP Negeri 1 Jelbuk
+                                Kepala SMP Negeri 1 Lorem Ipsum
                             </p>
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                         Selamat Datang di <br />
                         <span
                             class="bg-gradient-to-r from-blue-600 to-blue-900 bg-clip-text text-transparent"
-                            >SMP Negeri 1 Jelbuk</span
+                            >SMP Negeri 1 Lorem Ipsum</span
                         >
                     </h2>
 

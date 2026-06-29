@@ -2,7 +2,6 @@
     <section
         class="relative overflow-hidden bg-slate-50 pt-16 pb-20 lg:pt-24 lg:pb-28"
     >
-        <!-- Background Pattern (Subtle) -->
         <div
             class="pointer-events-none absolute inset-0 opacity-5"
             style="
@@ -15,7 +14,6 @@
             <div
                 class="grid grid-cols-1 items-center gap-16 lg:grid-cols-2 lg:gap-12"
             >
-                <!-- KIRI: TEKS & CTA -->
                 <div class="max-w-2xl text-center lg:text-left">
                     <div
                         class="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-100/50 px-4 py-1.5"
@@ -30,28 +28,32 @@
                         </span>
                         <span
                             class="text-sm font-bold tracking-wide text-blue-900"
-                            >Selamat Datang di</span
+                            >Selamat Datang di
+                            {{
+                                globalSettings?.school_name ??
+                                'SDN 3 Karang Kedawung'
+                            }}</span
                         >
                     </div>
 
                     <h1
                         class="text-4xl leading-[1.1] font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl"
                     >
-                        Website Resmi
-                        <br />
-                        SMP Negeri
-                        <span class="text-blue-700">1 Jelbuk.</span>
+                        {{
+                            globalSettings?.hero_title ??
+                            'Website Resmi Sekolah'
+                        }}
                     </h1>
 
                     <p
                         class="mt-6 text-lg leading-relaxed text-slate-600 sm:text-xl"
                     >
-                        Lorem ipsum, dolor sit amet consectetur adipisicing
-                        elit. Ipsa repellat facilis dolorem perferendis, rem
-                        officia sequi illo natus saepe quo.
+                        {{
+                            globalSettings?.hero_description ??
+                            'Lembaga pendidikan yang berdedikasi tinggi mencetak generasi unggul, berkarakter mulia, dan siap bersaing di era digital.'
+                        }}
                     </p>
 
-                    <!-- Statistik Sekolah (Lebih cocok dari sekadar checklist) -->
                     <div
                         class="mt-10 grid grid-cols-3 gap-4 border-y border-slate-200 py-6 text-center lg:gap-8 lg:divide-x lg:divide-slate-200 lg:text-left"
                     >
@@ -79,7 +81,11 @@
                         class="mt-8 flex flex-col items-center gap-4 sm:flex-row lg:justify-start"
                     >
                         <a
-                            href="/contact"
+                            :href="
+                                globalSettings?.whatsapp_number
+                                    ? `https://wa.me/${globalSettings.whatsapp_number}`
+                                    : '/contact'
+                            "
                             class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-700 px-8 py-3.5 text-base font-semibold text-white transition-all hover:bg-blue-800 focus:ring-4 focus:ring-blue-100 sm:w-auto"
                         >
                             Hubungi Kami
@@ -95,9 +101,7 @@
                     </div>
                 </div>
 
-                <!-- KANAN: KOMPOSISI GAMBAR GRID -->
                 <div class="relative mx-auto w-full max-w-lg lg:max-w-none">
-                    <!-- Ornamen -->
                     <div
                         class="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-yellow-400 opacity-50 blur-2xl"
                     ></div>
@@ -107,12 +111,16 @@
 
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-4">
-                            <!-- Foto 1 (Portrait) -->
                             <div
                                 class="relative overflow-hidden rounded-2xl shadow-lg"
                             >
                                 <img
-                                    src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=crop"
+                                    :src="
+                                        getImageUrl(
+                                            globalSettings?.hero_images?.[0],
+                                        ) ??
+                                        'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=crop'
+                                    "
                                     alt="Siswa berprestasi"
                                     class="h-64 w-full object-cover transition duration-500 hover:scale-105"
                                 />
@@ -120,24 +128,32 @@
                                     class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"
                                 ></div>
                             </div>
-                            <!-- Foto 2 (Landscape) -->
                             <div
                                 class="relative overflow-hidden rounded-2xl shadow-lg"
                             >
                                 <img
-                                    src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=800&auto=format&fit=crop"
+                                    :src="
+                                        getImageUrl(
+                                            globalSettings?.hero_images?.[1],
+                                        ) ??
+                                        'https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=800&auto=format&fit=crop'
+                                    "
                                     alt="Kegiatan belajar"
                                     class="h-48 w-full object-cover transition duration-500 hover:scale-105"
                                 />
                             </div>
                         </div>
                         <div class="space-y-4 pt-12">
-                            <!-- Foto 3 (Portrait panjang) -->
                             <div
                                 class="relative overflow-hidden rounded-2xl shadow-lg"
                             >
                                 <img
-                                    src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?q=80&w=800&auto=format&fit=crop"
+                                    :src="
+                                        getImageUrl(
+                                            globalSettings?.hero_images?.[2],
+                                        ) ??
+                                        'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?q=80&w=800&auto=format&fit=crop'
+                                    "
                                     alt="Fasilitas sekolah"
                                     class="h-80 w-full object-cover transition duration-500 hover:scale-105"
                                 />
@@ -151,8 +167,21 @@
 </template>
 
 <script setup>
-// Script jadi lebih bersih karena kita tidak memakai complex slider
-// Cukup elemen UI statis namun interaktif melalui CSS hover.
+import { computed } from 'vue';
+import { usePage } from '@inertiajs/vue3'; // 👈 Menggunakan Inertia Vue3 adapter
+
+// Di Vue 3, shared props diakses via usePage().props.nama_properti
+const page = usePage();
+const globalSettings = computed(() => page.props.globalSettings);
+
+/**
+ * Helper function untuk membaca path file upload dari Laravel Storage
+ */
+const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    return `/storage/${path}`;
+};
 </script>
 
 <style scoped>

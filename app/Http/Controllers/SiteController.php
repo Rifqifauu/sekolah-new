@@ -6,37 +6,48 @@ use App\Models\Extracurricular;
 use App\Models\Media;
 use App\Models\People;
 use App\Models\Post;
+use App\Models\Achievement;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class SiteController extends Controller
 {
     /**
-     * Halaman Utama (Beranda / Welcome)
-     * Tidak dipaginasi karena hanya menampilkan beberapa data terbaru.
+     * Halaman Utama (Beranda)
      */
     public function index()
     {
         $latestArticles = Post::where('type', 'article')
             ->where('is_published', true)
-            ->latest()
-            ->take(3)
-            ->get();
+            ->latest()->take(3)->get();
 
         $latestAnnouncements = Post::where('type', 'announcement')
             ->where('is_published', true)
-            ->latest()
+            ->latest()->take(3)->get();
+
+        $latestAchievements = Achievement::latest('year')
             ->take(3)
+            ->get();
+
+        $latestMedia = Media::latest()
+            ->take(6)
+            ->get();
+
+        $extracurriculars = Extracurricular::orderBy('name', 'asc')
+            ->take(4)
             ->get();
 
         return Inertia::render('Welcome', [
             'latestArticles' => $latestArticles,
             'latestAnnouncements' => $latestAnnouncements,
+            'latestAchievements' => $latestAchievements,
+            'latestMedia' => $latestMedia,
+            'extracurriculars' => $extracurriculars,
         ]);
     }
 
     /**
-     * Halaman Daftar Artikel dengan Search & Pagination
+     * Pusat Informasi
      */
     public function article(Request $request)
     {
@@ -60,9 +71,26 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Halaman Daftar Pengumuman dengan Search & Pagination
-     */
+    public function detailArtikel($slug)
+    {
+        $article = Post::where('type', 'article')
+            ->where('is_published', true)
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        $recommendations = Post::where('type', 'article')
+            ->where('is_published', true)
+            ->where('id', '!=', $article->id)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        return Inertia::render('PusatInformasi/DetailArtikel', [
+            'article' => $article,
+            'recommendations' => $recommendations,
+        ]);
+    }
+
     public function announcement(Request $request)
     {
         $search = $request->input('search');
@@ -85,13 +113,29 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Halaman Galeri / Media dengan Search & Pagination
-     */
+    public function detailPengumuman($slug)
+    {
+        $announcement = Post::where('type', 'announcement')
+            ->where('is_published', true)
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        $recentAnnouncements = Post::where('type', 'announcement')
+            ->where('is_published', true)
+            ->where('id', '!=', $announcement->id)
+            ->latest()
+            ->take(4)
+            ->get(['id', 'title', 'slug', 'created_at']);
+
+        return Inertia::render('PusatInformasi/DetailPengumuman', [
+            'announcement' => $announcement,
+            'recentAnnouncements' => $recentAnnouncements,
+        ]);
+    }
+
     public function media(Request $request)
     {
         $search = $request->input('search');
-
 
         $media = Media::when($search, function ($query, $search) {
             $query->where(function ($q) use ($search) {
@@ -103,7 +147,6 @@ class SiteController extends Controller
         ->paginate(12)
         ->withQueryString();
 
-
         return Inertia::render('PusatInformasi/Galeri', [
             'media' => $media,
             'filters' => $request->only(['search']),
@@ -111,7 +154,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Halaman Daftar Guru dengan Search & Pagination
+     * Sivitas & Kesiswaan
      */
     public function teacher(Request $request)
     {
@@ -119,7 +162,6 @@ class SiteController extends Controller
 
         $teachers = People::where('role', 'teacher')
             ->when($search, function ($query, $search) {
-                // Diperbarui agar bisa mencari berdasarkan Nama ATAU NIP/NUPTK
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                       ->orWhere('id_number', 'like', "%{$search}%");
@@ -135,16 +177,12 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Halaman Daftar Staf dengan Search & Pagination
-     */
     public function staff(Request $request)
     {
         $search = $request->input('search');
 
         $staff = People::where('role', 'staff')
             ->when($search, function ($query, $search) {
-                // Diperbarui agar bisa mencari berdasarkan Nama ATAU NIP/NUPTK
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                       ->orWhere('id_number', 'like', "%{$search}%");
@@ -160,9 +198,6 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Halaman Ekstrakurikuler dengan Search & Pagination
-     */
     public function extra(Request $request)
     {
         $search = $request->input('search');
@@ -179,6 +214,27 @@ class SiteController extends Controller
 
         return Inertia::render('Kesiswaan/Ekstrakurikuler', [
             'extras' => $extras,
+            'filters' => $request->only(['search']),
+        ]);
+    }
+
+    public function achievement(Request $request)
+    {
+        $search = $request->input('search');
+
+        $achievements = Achievement::when($search, function ($query, $search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%")
+                  ->orWhere('level', 'like', "%{$search}%");
+            });
+        })
+        ->orderBy('year', 'desc')
+        ->paginate(12)
+        ->withQueryString();
+
+        return Inertia::render('Kesiswaan/Prestasi', [
+            'achievements' => $achievements,
             'filters' => $request->only(['search']),
         ]);
     }

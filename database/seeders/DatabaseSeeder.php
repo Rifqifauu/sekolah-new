@@ -18,6 +18,7 @@ use App\Models\Grade;
 use App\Models\Attendance;
 use App\Models\StudentReport;
 use App\Models\User;
+use App\Models\Achievement; // Tambahkan import model Achievement
 
 class DatabaseSeeder extends Seeder
 {
@@ -76,7 +77,6 @@ class DatabaseSeeder extends Seeder
                 'key' => 'contact_email',
                 'value' => json_encode('info@sekolah.sch.id')
             ],
-            // Contoh jika ingin memasukkan struktur array/object JSON utuh:
             [
                 'key' => 'social_media',
                 'value' => json_encode([
@@ -182,6 +182,38 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('Puluhan data dummy berhasil di-generate menggunakan Faker (JSON Settings OK)!');
+        // 7. Data Master Prestasi (Achievement) & Relasi ke Siswa
+        $achievementCategories = ['Akademik', 'Olahraga & Seni', 'Penelitian', 'Teknologi'];
+        $achievementLevels = ['Sekolah', 'Kabupaten', 'Provinsi', 'Nasional', 'Internasional'];
+        $achievementRanks = ['Juara 1', 'Juara 2', 'Juara 3', 'Harapan 1', 'Medali Emas'];
+
+        $titles = [
+            'Olimpiade Sains Nasional', 'Kejuaraan Pencak Silat', 'Lomba Debat Bahasa Inggris',
+            'Turnamen Basket Fiba', 'Kompetisi Robotik', 'Lomba Karya Tulis Ilmiah'
+        ];
+
+        for ($i = 0; $i < 15; $i++) {
+            $achievement = Achievement::create([
+                'title' => $faker->randomElement($titles) . ' Tingkat ' . $faker->city,
+                'category' => $faker->randomElement($achievementCategories),
+                'level' => $faker->randomElement($achievementLevels),
+                'rank' => $faker->randomElement($achievementRanks),
+                'year' => $faker->numberBetween(2022, 2026),
+                'image' => 'prestasi-' . $faker->numberBetween(1, 5) . '.jpg',
+            ]);
+
+            // Ambil 1 sampai 3 siswa secara acak untuk dihubungkan ke prestasi ini
+            $randomStudents = $faker->randomElements($students, $faker->numberBetween(1, 3));
+
+            // Ambil ID dari siswa-siswa tersebut
+            $studentIds = array_map(function($student) {
+                return $student->id;
+            }, $randomStudents);
+
+            // Simpan ke tabel pivot (achievement_people)
+            $achievement->students()->attach($studentIds);
+        }
+
+        $this->command->info('Puluhan data dummy beserta Data Prestasi & Relasi Siswa berhasil di-generate!');
     }
 }

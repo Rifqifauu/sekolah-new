@@ -31,7 +31,7 @@
 
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
                 <article
-                    v-for="item in announcements"
+                    v-for="item in paginatedAnnouncements"
                     :key="item.id"
                     class="group relative flex items-start gap-5 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-100 hover:shadow-xl hover:shadow-blue-900/5 sm:p-6"
                 >
@@ -104,71 +104,101 @@
                     </div>
                 </article>
             </div>
+
+            <div
+                v-if="totalPages > 1"
+                class="mt-10 flex items-center justify-center gap-2"
+            >
+                <button
+                    @click="prevPage"
+                    :disabled="currentPage === 1"
+                    class="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <button
+                    v-for="page in totalPages"
+                    :key="page"
+                    @click="goToPage(page)"
+                    :class="[
+                        'flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-semibold transition-colors',
+                        currentPage === page
+                            ? 'border-blue-600 bg-blue-600 text-white'
+                            : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50',
+                    ]"
+                >
+                    {{ page }}
+                </button>
+
+                <button
+                    @click="nextPage"
+                    :disabled="currentPage === totalPages"
+                    class="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
         </div>
     </section>
 </template>
-
 <script setup>
-import { defineProps } from 'vue';
+import { ref, computed, watch } from 'vue';
 
-// Dummy data menggunakan props agar mudah diganti dari database nanti
 const props = defineProps({
     announcements: {
         type: Array,
-        default: () => [
-            {
-                id: 1,
-                title: 'Pengumuman Kelulusan & Pengambilan SKL Siswa Kelas XII Tahun 2026',
-                description:
-                    'Bagi seluruh siswa kelas XII, Surat Keterangan Lulus (SKL) sudah dapat diambil di ruang Tata Usaha dengan membawa kartu pelajar dan bukti bebas perpustakaan.',
-                day: '25',
-                month: 'Jun',
-                year: '2026',
-                category: 'Akademik',
-                isUrgent: true,
-                hasAttachment: true,
-                link: '/pengumuman/pengambilan-skl-2026',
-            },
-            {
-                id: 2,
-                title: 'Jadwal Pelaksanaan Daftar Ulang PPDB Jalur Zonasi',
-                description:
-                    'Calon peserta didik baru yang dinyatakan lulus jalur zonasi diwajibkan melakukan daftar ulang dengan membawa dokumen persyaratan asli dan fotokopi.',
-                day: '28',
-                month: 'Jun',
-                year: '2026',
-                category: 'PPDB',
-                isUrgent: false,
-                hasAttachment: true,
-                link: '/pengumuman/daftar-ulang-zonasi',
-            },
-            {
-                id: 3,
-                title: 'Undangan Rapat Pleno Wali Murid Kelas X Bersama Komite Sekolah',
-                description:
-                    'Mengharap kehadiran Bapak/Ibu wali murid kelas X pada acara pemaparan program sekolah dan pembentukan pengurus paguyuban kelas.',
-                day: '02',
-                month: 'Jul',
-                year: '2026',
-                category: 'Agenda',
-                isUrgent: false,
-                hasAttachment: false,
-                link: '/pengumuman/rapat-wali-murid',
-            },
-            {
-                id: 4,
-                title: 'Pemberitahuan Libur Akhir Semester Genap Tahun Ajaran 2025/2026',
-                description:
-                    'Libur akhir semester genap akan berlangsung selama 2 minggu. Kegiatan belajar mengajar (KBM) tahun ajaran baru akan dimulai kembali pada pertengahan Juli.',
-                day: '10',
-                month: 'Jul',
-                year: '2026',
-                category: 'Informasi',
-                isUrgent: false,
-                hasAttachment: false,
-                link: '/pengumuman/libur-semester-genap',
-            },
-        ],
+        default: () => [],
     },
 });
+
+const formatAnnouncement = (item) => {
+    const date = new Date(item.created_at);
+    return {
+        ...item,
+        day: date.getDate(),
+        month: date.toLocaleString('id-ID', { month: 'short' }), // Jan, Feb, dst
+        year: date.getFullYear(),
+        link: `/pengumuman/${item.slug}`, // Pastikan link mengarah ke route slug
+        description: item.content ? item.content.substring(0, 100) + '...' : '',
+        isUrgent: item.is_urgent || false, // Sesuaikan dengan kolom database Anda
+    };
+};
+
+const currentPage = ref(1);
+const itemsPerPage = ref(6);
+
+// Proses data mentah dari database menjadi format yang siap ditampilkan
+const processedAnnouncements = computed(() => {
+    return props.announcements.map(formatAnnouncement);
+});
+
+const totalPages = computed(() => {
+    return Math.ceil(processedAnnouncements.value.length / itemsPerPage.value);
+});
+
+// Memotong data yang sudah diproses untuk pagination
+const paginatedAnnouncements = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    return processedAnnouncements.value.slice(start, end);
+});
+
+// Watcher agar kembali ke halaman 1 jika data berubah
+watch(
+    () => props.announcements,
+    () => {
+        currentPage.value = 1;
+    },
+);
+
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) currentPage.value++;
+};
+const prevPage = () => {
+    if (currentPage.value > 1) currentPage.value--;
+};
+const goToPage = (page) => {
+    currentPage.value = page;
+};
 </script>
