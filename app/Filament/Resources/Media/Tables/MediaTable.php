@@ -5,7 +5,10 @@ namespace App\Filament\Resources\Media\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Table;
 
 class MediaTable
@@ -14,8 +17,11 @@ class MediaTable
     {
         return $table
             ->columns([
-                TextColumn::make('path')
-                    ->searchable(),
+            ImageColumn::make('path')
+                                ->label('Preview')
+                                ->disk('public')
+                                ->getStateUsing(fn ($record) => $record->type === 'image' ? $record->path : null)
+                                ->size(150),
                 TextColumn::make('type')
                     ->badge(),
                 TextColumn::make('name')
@@ -36,6 +42,7 @@ class MediaTable
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

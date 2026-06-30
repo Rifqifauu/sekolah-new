@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Extracurriculars\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -17,7 +18,12 @@ class ExtracurricularsTable
             ->columns([
                 TextColumn::make('name')
                     ->searchable(),
-                ImageColumn::make('image'),
+                TextColumn::make('description')
+                    ->searchable()
+                    ->wrap(),
+                ImageColumn::make('image')
+                ->disk("public")
+                ->height(120),
                 TextColumn::make('schedule')
                     ->searchable(),
                 TextColumn::make('created_at')
@@ -34,6 +40,7 @@ class ExtracurricularsTable
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

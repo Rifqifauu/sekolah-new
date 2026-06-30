@@ -9,6 +9,7 @@ use App\Filament\Resources\Extracurriculars\Schemas\ExtracurricularForm;
 use App\Filament\Resources\Extracurriculars\Tables\ExtracurricularsTable;
 use App\Models\Extracurricular;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -18,7 +19,10 @@ class ExtracurricularResource extends Resource
 {
     protected static ?string $model = Extracurricular::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleGroup;
+    protected static ?string $modelLabel = 'Ekstrakurikuler';
+    protected static string | UnitEnum | null $navigationGroup = 'Akademik';
+
 
     public static function form(Schema $schema): Schema
     {

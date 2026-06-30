@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Media\Schemas;
 
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Schema;
 
 class MediaForm
@@ -12,14 +13,18 @@ class MediaForm
     {
         return $schema
             ->components([
-                TextInput::make('path')
-                    ->required(),
+                FileUpload::make('path')
+                ->label("Gambar/Video")
+                    ->required()
+                    ->disk("public"),
                 Select::make('type')
                     ->options(['image' => 'Image', 'video' => 'Video'])
                     ->required(),
                 TextInput::make('name')
+                ->label('nama')
                     ->required(),
                 TextInput::make('description')
+                ->label('deskripsi')
                     ->required(),
             ]);
     }

@@ -9,6 +9,7 @@ use App\Filament\Resources\People\Schemas\PeopleForm;
 use App\Filament\Resources\People\Tables\PeopleTable;
 use App\Models\People;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -18,7 +19,11 @@ class PeopleResource extends Resource
 {
     protected static ?string $model = People::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
+    protected static ?string $modelLabel = 'Data Guru & Siswa';
+    protected static string | UnitEnum | null $navigationGroup = 'Pusat Informasi';
+
+
 
     public static function form(Schema $schema): Schema
     {
@@ -41,8 +46,7 @@ class PeopleResource extends Resource
     {
         return [
             'index' => ListPeople::route('/'),
-            'create' => CreatePeople::route('/create'),
-            'edit' => EditPeople::route('/{record}/edit'),
+
         ];
     }
 }

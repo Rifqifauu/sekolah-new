@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Filament\Resources\People\Schemas;
 
 use Filament\Forms\Components\Select;
@@ -13,20 +12,32 @@ class PeopleForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label('Nama Lengkap') // Ubah label
                     ->required(),
                 TextInput::make('email')
-                    ->label('Email address')
+                    ->label('Alamat Email') // Ubah label
                     ->email()
                     ->required(),
                 TextInput::make('phone')
+                    ->label('Nomor Telepon') // Ubah label
                     ->tel(),
                 TextInput::make('id_number')
+                    ->label('Nomor Identitas') // Ubah label
                     ->required(),
                 Select::make('role')
-                    ->options(['teacher' => 'Teacher', 'student' => 'Student', 'staff' => 'Staff'])
+                    ->label('Peran') // Ubah label
+                    ->options([
+                        'teacher' => 'Guru',
+                        'student' => 'Murid',
+                        'staff'   => 'Staf'
+                    ])
                     ->required(),
                 Select::make('classroom_id')
-                    ->relationship('classroom', 'name'),
+                    ->label('Kelas') // Ubah label
+                    ->relationship('classroom', 'name')
+                    ->placeholder('Pilih Kelas') // Tambahkan placeholder
+                    ->searchable() // Tambahkan agar mudah dicari
+                    ->preload(),
             ]);
     }
 }
