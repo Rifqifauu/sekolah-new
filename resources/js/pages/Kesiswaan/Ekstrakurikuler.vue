@@ -14,8 +14,9 @@
                             ></span>
                             <span
                                 class="text-xs font-bold tracking-widest text-blue-600 uppercase"
-                                >Kegiatan Siswa</span
                             >
+                                Kegiatan Siswa
+                            </span>
                         </div>
                         <h2
                             class="text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl lg:text-5xl"
@@ -63,7 +64,10 @@
                 </div>
 
                 <div
-                    v-if="extracurricularList.data.length === 0"
+                    v-if="
+                        !extracurriculars.data ||
+                        extracurriculars.data.length === 0
+                    "
                     class="flex flex-col items-center justify-center rounded-2xl border border-slate-100 bg-white p-16 text-center shadow-sm"
                 >
                     <div
@@ -96,7 +100,7 @@
                     class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
                 >
                     <article
-                        v-for="item in extracurricularList.data"
+                        v-for="item in extracurriculars.data"
                         :key="item.id"
                         @click="openModal(item)"
                         class="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-slate-200 hover:shadow-md"
@@ -160,38 +164,42 @@
                                 </svg>
                                 <span
                                     class="truncate text-xs font-semibold text-slate-600"
-                                    >{{ item.schedule }}</span
                                 >
+                                    {{ item.schedule }}
+                                </span>
                             </div>
                         </div>
                     </article>
                 </div>
 
                 <div
-                    v-if="extracurricularList.links?.length > 3"
+                    v-if="paginationLinks.length > 3"
                     class="mt-12 flex justify-center"
                 >
                     <nav
-                        class="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-sm"
+                        class="inline-flex shrink-0 items-center gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-sm"
                     >
                         <template
-                            v-for="(link, key) in extracurricularList.links"
+                            v-for="(link, key) in paginationLinks"
                             :key="key"
                         >
-                            <span
-                                v-if="!link.url"
+                            <div
+                                v-if="link.active"
+                                class="flex h-9 min-w-[2.25rem] items-center justify-center rounded-full bg-blue-600 px-3 text-xs font-semibold text-white shadow-md"
+                                v-html="link.label"
+                            ></div>
+
+                            <div
+                                v-else-if="link.url === null"
                                 class="flex h-9 min-w-[2.25rem] items-center justify-center px-3 text-xs text-slate-400"
                                 v-html="link.label"
-                            ></span>
+                            ></div>
+
                             <Link
                                 v-else
                                 :href="link.url"
-                                class="flex h-9 min-w-[2.25rem] items-center justify-center rounded-full px-3 text-xs font-semibold transition-colors"
-                                :class="
-                                    link.active
-                                        ? 'bg-blue-600 text-white'
-                                        : 'text-slate-600 hover:bg-slate-50'
-                                "
+                                preserve-scroll
+                                class="flex h-9 min-w-[2.25rem] items-center justify-center rounded-full px-3 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50"
                                 v-html="link.label"
                             ></Link>
                         </template>
@@ -317,12 +325,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed } from 'vue'; // WAJIB ada computed
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/components/AppLayout.vue';
 
 const props = defineProps({
-    extracurriculars: Object,
+    extracurriculars: {
+        type: Object,
+        default: () => ({ data: [], links: [] }),
+    },
     filters: Object,
 });
 
@@ -330,75 +341,33 @@ const isModalOpen = ref(false);
 const selectedItem = ref(null);
 const search = ref(props.filters?.search || '');
 
-// Dummy Data Terstruktur
-const dummyData = {
-    data: [
-        {
-            id: 1,
-            name: 'Pramuka',
-            description:
-                'Ekstrakurikuler wajib yang melatih kemandirian, kedisiplinan, kerja sama tim, dan kepemimpinan melalui berbagai kegiatan kepanduan di alam terbuka.',
-            image: 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?q=80&w=600&auto=format&fit=crop',
-            schedule: 'Jumat, 15:00 - 17:00 WIB',
-        },
-        {
-            id: 2,
-            name: 'PMR (Palang Merah Remaja)',
-            description:
-                'Wadah pembinaan generasi muda untuk meningkatkan kepedulian sosial, keterampilan pertolongan pertama, dan kesehatan lingkungan sekolah.',
-            image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=600&auto=format&fit=crop',
-            schedule: 'Rabu, 15:30 - 17:00 WIB',
-        },
-        {
-            id: 3,
-            name: 'Klub Robotik',
-            description:
-                'Mengembangkan bakat siswa dalam bidang teknologi, pemrograman, dan rekayasa melalui pembuatan robot sederhana hingga tingkat kompetisi nasional.',
-            image: 'https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?q=80&w=600&auto=format&fit=crop',
-            schedule: 'Selasa & Kamis, 14:00 - 16:00 WIB',
-        },
-        {
-            id: 4,
-            name: 'Futsal',
-            description:
-                'Ekskul olahraga yang bertujuan menyalurkan hobi sepak bola dalam ruangan, melatih sportivitas, strategi, kerja sama tim, dan menjaga kebugaran jasmani.',
-            image: 'https://images.unsplash.com/photo-1534011546717-407bcea4d512?q=80&w=600&auto=format&fit=crop',
-            schedule: 'Senin & Kamis, 15:30 - 17:30 WIB',
-        },
-        {
-            id: 5,
-            name: 'Tari Tradisional',
-            description:
-                'Melestarikan kebudayaan bangsa dengan mempelajari berbagai macam tarian daerah nusantara. Anggota ekskul ini rutin tampil di acara formal.',
-            image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=600&auto=format&fit=crop',
-            schedule: 'Sabtu, 09:00 - 11:30 WIB',
-        },
-        {
-            id: 6,
-            name: 'English Club',
-            description:
-                'Fokus pada peningkatan kemampuan berbicara (speaking), berdebat (debate), bercerita (story telling), dan pidato (speech) dalam bahasa Inggris.',
-            image: null,
-            schedule: 'Selasa, 15:00 - 16:30 WIB',
-        },
-    ],
-    links: [
-        { url: null, label: '&laquo; Previous', active: false },
-        { url: '/ekstrakurikuler?page=1', label: '1', active: true },
-        { url: '/ekstrakurikuler?page=2', label: '2', active: false },
-        {
-            url: '/ekstrakurikuler?page=2',
-            label: 'Next &raquo;',
-            active: false,
-        },
-    ],
-};
+// Computed Property Pagination (Mencegah Error String Includes & Menangani API Resource Meta)
+const paginationLinks = computed(() => {
+    const links =
+        props.extracurriculars?.meta?.links ||
+        props.extracurriculars?.links ||
+        [];
 
-// PERBAIKAN BUG: Menggunakan computed agar data selalu reaktif saat props berubah (pencarian)
-const extracurricularList = computed(() => {
-    return props.extracurriculars?.data?.length > 0
-        ? props.extracurriculars
-        : dummyData;
+    return links.map((link) => {
+        let cleanLabel = String(link.label || '');
+
+        if (
+            cleanLabel.includes('pagination.previous') ||
+            cleanLabel.includes('Previous')
+        ) {
+            cleanLabel = '&laquo;';
+        } else if (
+            cleanLabel.includes('pagination.next') ||
+            cleanLabel.includes('Next')
+        ) {
+            cleanLabel = '&raquo;';
+        }
+
+        return {
+            ...link,
+            label: cleanLabel,
+        };
+    });
 });
 
 const openModal = (item) => {
@@ -417,9 +386,13 @@ const closeModal = () => {
 
 const handleSearch = () => {
     router.get(
-        '/ekstrakurikuler',
+        '/kesiswaan/ekstrakurikuler',
         { search: search.value },
-        { preserveState: true, replace: true },
+        {
+            preserveState: true,
+            replace: true,
+            preserveScroll: true,
+        },
     );
 };
 </script>

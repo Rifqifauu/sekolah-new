@@ -12,8 +12,9 @@
                             <span class="h-px w-10 bg-blue-600"></span>
                             <span
                                 class="text-sm font-bold tracking-widest text-blue-600 uppercase"
-                                >Pusat Informasi</span
                             >
+                                Pusat Informasi
+                            </span>
                         </div>
                         <h2
                             class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl md:text-5xl"
@@ -102,29 +103,34 @@
                         >
                             <span
                                 class="text-xs font-bold tracking-wider text-blue-200 uppercase"
-                                >{{ getDateInfo(item.created_at).month }}</span
                             >
+                                {{ getDateInfo(item.created_at).month }}
+                            </span>
                             <span
                                 class="my-0 text-2xl font-black text-white sm:my-1 sm:text-3xl"
-                                >{{ getDateInfo(item.created_at).day }}</span
                             >
+                                {{ getDateInfo(item.created_at).day }}
+                            </span>
                             <span
                                 class="text-[10px] font-semibold text-blue-300"
-                                >{{ getDateInfo(item.created_at).year }}</span
                             >
+                                {{ getDateInfo(item.created_at).year }}
+                            </span>
                         </div>
 
                         <div class="flex h-full w-full flex-1 flex-col">
                             <div class="mb-3 flex flex-wrap items-center gap-2">
                                 <span
                                     class="rounded-md bg-gray-100 px-2.5 py-1 text-[10px] font-bold tracking-wider text-gray-600 uppercase"
-                                    >Informasi</span
                                 >
+                                    Informasi
+                                </span>
                                 <span
                                     v-if="item.isUrgent"
                                     class="inline-flex animate-pulse items-center gap-1.5 rounded-md bg-red-50 px-2.5 py-1 text-[10px] font-bold text-red-600 uppercase ring-1 ring-red-500/10 ring-inset"
-                                    >Segera</span
                                 >
+                                    Segera
+                                </span>
                             </div>
 
                             <h3
@@ -169,31 +175,33 @@
                 </div>
 
                 <div
-                    v-if="announcements.links && announcements.links.length > 3"
+                    v-if="paginationLinks.length > 3"
                     class="mt-12 flex justify-center"
                 >
                     <div
                         class="inline-flex shrink-0 items-center gap-1 rounded-full border border-gray-200 bg-white p-1 shadow-sm"
                     >
                         <template
-                            v-for="(link, key) in announcements.links"
+                            v-for="(link, key) in paginationLinks"
                             :key="key"
                         >
                             <div
-                                v-if="link.url === null"
+                                v-if="link.active"
+                                class="flex h-10 min-w-[2.5rem] items-center justify-center rounded-full bg-blue-600 px-3 text-sm font-medium text-white shadow-md"
+                                v-html="link.label"
+                            ></div>
+
+                            <div
+                                v-else-if="link.url === null"
                                 class="flex h-10 min-w-[2.5rem] items-center justify-center px-3 text-sm text-gray-400"
                                 v-html="link.label"
                             ></div>
+
                             <Link
                                 v-else
                                 :href="link.url"
                                 preserve-scroll
-                                class="flex h-10 min-w-[2.5rem] items-center justify-center rounded-full px-3 text-sm font-medium transition-colors"
-                                :class="
-                                    link.active
-                                        ? 'bg-blue-600 text-white'
-                                        : 'text-gray-600 hover:bg-gray-100'
-                                "
+                                class="flex h-10 min-w-[2.5rem] items-center justify-center rounded-full px-3 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
                                 v-html="link.label"
                             ></Link>
                         </template>
@@ -205,7 +213,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/components/AppLayout.vue';
 
@@ -222,6 +230,34 @@ const props = defineProps({
 
 const search = ref(props.filters?.search || '');
 
+const paginationLinks = computed(() => {
+    const links =
+        props.announcements?.meta?.links || props.announcements?.links || [];
+
+    return links.map((link) => {
+        // Konversi paksa ke String agar angka '1', '2' tidak membuat error fungsi .includes()
+        let cleanLabel = String(link.label || '');
+
+        // Cek dan ganti label default Laravel menjadi icon atau teks yang lebih rapi
+        if (
+            cleanLabel.includes('pagination.previous') ||
+            cleanLabel.includes('Previous')
+        ) {
+            cleanLabel = '&laquo;';
+        } else if (
+            cleanLabel.includes('pagination.next') ||
+            cleanLabel.includes('Next')
+        ) {
+            cleanLabel = '&raquo;';
+        }
+
+        return {
+            ...link,
+            label: cleanLabel,
+        };
+    });
+});
+
 const handleSearch = () => {
     router.get(
         '/pengumuman',
@@ -235,6 +271,8 @@ const handleSearch = () => {
 };
 
 const getDateInfo = (dateString) => {
+    if (!dateString) return { day: '-', month: '-', year: '-' };
+
     const date = new Date(dateString);
     return {
         day: date.toLocaleDateString('id-ID', { day: '2-digit' }),

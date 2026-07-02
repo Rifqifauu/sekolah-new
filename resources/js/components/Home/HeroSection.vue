@@ -64,13 +64,17 @@
                             </p>
                         </div>
                         <div class="lg:px-4">
-                            <p class="text-3xl font-bold text-blue-700">45+</p>
+                            <p class="text-3xl font-bold text-blue-700">
+                                {{ teacherCount }}
+                            </p>
                             <p class="mt-1 text-sm font-medium text-slate-500">
                                 Pengajar Ahli
                             </p>
                         </div>
                         <div class="lg:pl-4">
-                            <p class="text-3xl font-bold text-blue-700">1.2K</p>
+                            <p class="text-3xl font-bold text-blue-700">
+                                {{ studentCount }}
+                            </p>
                             <p class="mt-1 text-sm font-medium text-slate-500">
                                 Siswa Aktif
                             </p>
@@ -173,10 +177,8 @@ import { usePage } from '@inertiajs/vue3'; // 👈 Menggunakan Inertia Vue3 adap
 // Di Vue 3, shared props diakses via usePage().props.nama_properti
 const page = usePage();
 const globalSettings = computed(() => page.props.globalSettings);
-
-/**
- * Helper function untuk membaca path file upload dari Laravel Storage
- */
+const teacherCount = page.props.teacherCount;
+const studentCount = page.props.studentCount;
 const getImageUrl = (path) => {
     if (!path) return null;
     if (path.startsWith('http://') || path.startsWith('https://')) return path;

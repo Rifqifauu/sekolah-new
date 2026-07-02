@@ -7,6 +7,7 @@ use App\Models\Media;
 use App\Models\People;
 use App\Models\Post;
 use App\Models\Achievement;
+use App\Models\Facility;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -17,6 +18,8 @@ class SiteController extends Controller
      */
     public function index()
     {
+        $teacherCount = People::where('role','teacher')->count();
+        $studentCount = People::where('role','student')->count();
         $latestArticles = Post::where('type', 'article')
             ->where('is_published', true)
             ->latest()->take(3)->get();
@@ -38,6 +41,8 @@ class SiteController extends Controller
             ->get();
 
         return Inertia::render('Welcome', [
+        'teacherCount'=>$teacherCount,
+        'studentCount'=>$studentCount,
             'latestArticles' => $latestArticles,
             'latestAnnouncements' => $latestAnnouncements,
             'latestAchievements' => $latestAchievements,
@@ -160,13 +165,14 @@ class SiteController extends Controller
     {
         $search = $request->input('search');
 
-        $teachers = People::where('role', 'teacher')
+        $teachers = People::where('role', ['teacher','staff'])
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                       ->orWhere('id_number', 'like', "%{$search}%");
                 });
             })
+            ->with('classroom')
             ->orderBy('name', 'asc')
             ->paginate(12)
             ->withQueryString();
@@ -177,26 +183,7 @@ class SiteController extends Controller
         ]);
     }
 
-    public function staff(Request $request)
-    {
-        $search = $request->input('search');
 
-        $staff = People::where('role', 'staff')
-            ->when($search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('id_number', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('name', 'asc')
-            ->paginate(12)
-            ->withQueryString();
-
-        return Inertia::render('Sivitas/DataStaf', [
-            'staff' => $staff,
-            'filters' => $request->only(['search']),
-        ]);
-    }
 
     public function extra(Request $request)
     {
@@ -213,7 +200,7 @@ class SiteController extends Controller
         ->withQueryString();
 
         return Inertia::render('Kesiswaan/Ekstrakurikuler', [
-            'extras' => $extras,
+            'extracurriculars' => $extras,
             'filters' => $request->only(['search']),
         ]);
     }
@@ -238,4 +225,28 @@ class SiteController extends Controller
             'filters' => $request->only(['search']),
         ]);
     }
+    /**
+         * Profil & Fasilitas
+         */
+        public function facility(Request $request)
+        {
+            $search = $request->input('search');
+
+            $facilities = Facility::when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhere('category', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('category', 'asc') // Bisa diubah ke 'name' jika ingin urut abjad nama
+            ->orderBy('name', 'asc')
+            ->paginate(12)
+            ->withQueryString();
+
+            return Inertia::render('Kesiswaan/Fasilitas', [ // Sesuaikan path folder Vue Anda
+                'facilities' => $facilities,
+                'filters' => $request->only(['search']),
+            ]);
+        }
 }

@@ -17,7 +17,6 @@ Route::get('/', [SiteController::class, 'index'])->name('home');
 
 // Kepegawaian (Sivitas)
 Route::get('/sivitas/data-guru', [SiteController::class, 'teacher'])->name('teacher.index');
-Route::get('/sivitas/data-staf', [SiteController::class, 'staff'])->name('staff.index');
 
 // Kesiswaan (Ekstrakurikuler diambil dari database)
 Route::get('/kesiswaan/ekstrakurikuler', [SiteController::class, 'extra'])->name('extra.index');
@@ -39,7 +38,7 @@ Route::inertia('/profil/visi-misi', 'Profil/VisiMisi')->name('profil.visi-misi')
 // --- UBAH BAGIAN INI ---
 // Sebelumnya menggunakan Route::inertia, sekarang gunakan Route::get ke SiteController
 Route::get('/kesiswaan/prestasi', [SiteController::class, 'achievement'])->name('prestasi.index');
-Route::get('/kesiswaan/fasilitas', [SiteController::class, 'fasilitas'])->name('fasilitas.index');
+Route::get('/kesiswaan/fasilitas', [SiteController::class, 'facility'])->name('fasilitas.index');
 // -----------------------
 
 // Halaman Kontak

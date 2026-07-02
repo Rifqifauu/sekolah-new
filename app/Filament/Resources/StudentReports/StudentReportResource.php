@@ -3,12 +3,13 @@
 namespace App\Filament\Resources\StudentReports;
 
 use App\Filament\Resources\StudentReports\Pages\CreateStudentReport;
-use App\Filament\Resources\StudentReports\Pages\EditStudentReport;
+use App\Filament\Resources\StudentReports\Pages\ViewStudentReport;
 use App\Filament\Resources\StudentReports\Pages\ListStudentReports;
 use App\Filament\Resources\StudentReports\Schemas\StudentReportForm;
 use App\Filament\Resources\StudentReports\Tables\StudentReportsTable;
 use App\Models\StudentReport;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -18,8 +19,9 @@ class StudentReportResource extends Resource
 {
     protected static ?string $model = StudentReport::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedAcademicCap;
+    protected static ?string $modelLabel = 'Laporan Pembelajaran';
+    protected static string | UnitEnum | null $navigationGroup = 'Penilaian';
     public static function form(Schema $schema): Schema
     {
         return StudentReportForm::configure($schema);
@@ -42,7 +44,7 @@ class StudentReportResource extends Resource
         return [
             'index' => ListStudentReports::route('/'),
             'create' => CreateStudentReport::route('/create'),
-            'edit' => EditStudentReport::route('/{record}/edit'),
+            'view' => ViewStudentReport::route('/{record}/view'),
         ];
     }
 }

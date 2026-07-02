@@ -3,12 +3,13 @@
 namespace App\Filament\Resources\Attendances;
 
 use App\Filament\Resources\Attendances\Pages\CreateAttendance;
-use App\Filament\Resources\Attendances\Pages\EditAttendance;
+use App\Filament\Resources\Attendances\Pages\ViewAttendance;
 use App\Filament\Resources\Attendances\Pages\ListAttendances;
 use App\Filament\Resources\Attendances\Schemas\AttendanceForm;
 use App\Filament\Resources\Attendances\Tables\AttendancesTable;
 use App\Models\Attendance;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -18,7 +19,10 @@ class AttendanceResource extends Resource
 {
     protected static ?string $model = Attendance::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocument;
+    protected static ?string $modelLabel = 'Kehadiran';
+    protected static string | UnitEnum | null $navigationGroup = 'Penilaian';
+
 
     public static function form(Schema $schema): Schema
     {
@@ -42,7 +46,7 @@ class AttendanceResource extends Resource
         return [
             'index' => ListAttendances::route('/'),
             'create' => CreateAttendance::route('/create'),
-            'edit' => EditAttendance::route('/{record}/edit'),
+            'view' => ViewAttendance::route('/{record}'),
         ];
     }
 }

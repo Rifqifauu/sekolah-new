@@ -8,6 +8,8 @@ import NewPost from '@/components/Home/NewPost.vue';
 import WelcomeMessage from '@/components/Home/WelcomeMessage.vue';
 
 defineProps({
+    teacherCount: Number,
+    studentCount: Number,
     latestArticles: Array,
     latestAnnouncements: Array,
     latestAchievements: Array,
@@ -18,7 +20,10 @@ defineProps({
 
 <template>
     <AppLayout>
-        <HeroSection />
+        <HeroSection
+            :teacherCount="teacherCount"
+            :studentCount="studentCount"
+        />
         <WelcomeMessage />
 
         <NewPost :posts="latestArticles" />

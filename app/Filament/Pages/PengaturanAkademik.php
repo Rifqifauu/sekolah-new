@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 use App\Filament\Widgets\PeriodeTable;
 use App\Filament\Widgets\ClassroomTable;
 use App\Filament\Widgets\SubjectTable;
+use App\Filament\Widgets\GradeComponentTable;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Tabs;
@@ -37,6 +38,10 @@ class PengaturanAkademik extends Page
                         ->schema([
                             Livewire::make(SubjectTable::class),
                         ]),
+                    Tab::make('Komponen Penilaian')
+                    ->schema([
+                    Livewire::make(GradeComponentTable::class),
+                    ])
                 ])
                 ->persistTabInQueryString(),
         ]);

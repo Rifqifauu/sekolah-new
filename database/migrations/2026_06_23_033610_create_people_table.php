@@ -11,10 +11,16 @@ return new class extends Migration
         Schema::create('people', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('image')->nullable();
             $table->string('email')->unique();
-            $table->string('phone')->unique()->nullable(); // Kadang siswa belum punya HP
-            $table->string('id_number')->unique(); // NIK/NISN/NIP
+            $table->string('phone')->unique()->nullable();
+            $table->string('id_number')->unique();
+
+            $table->enum('gender', ['male', 'female']);
+            $table->string('position')->nullable(); // Untuk jabatan guru/staf
+
             $table->enum('role', ['teacher', 'student', 'staff']);
+
             $table->foreignId('classroom_id')->nullable()->constrained('classrooms')->nullOnDelete();
             $table->timestamps();
         });

@@ -263,10 +263,7 @@ const menuItems = [
     {
         label: 'Kepegawaian',
         href: '#',
-        subItems: [
-            { label: 'Data Guru', href: '/sivitas/data-guru' },
-            { label: 'Data Staf', href: '/sivitas/data-staf' },
-        ],
+        subItems: [{ label: 'Data Guru', href: '/sivitas/data-guru' }],
     },
     {
         label: 'Kesiswaan',

@@ -219,31 +219,33 @@
                 </div>
 
                 <div
-                    v-if="articles.links && articles.links.length > 3"
+                    v-if="paginationLinks.length > 3"
                     class="mt-12 flex justify-center"
                 >
                     <div
                         class="inline-flex shrink-0 items-center gap-1 rounded-full border border-gray-200 bg-white p-1 shadow-sm"
                     >
                         <template
-                            v-for="(link, key) in articles.links"
+                            v-for="(link, key) in paginationLinks"
                             :key="key"
                         >
                             <div
-                                v-if="link.url === null"
+                                v-if="link.active"
+                                class="flex h-10 min-w-[2.5rem] items-center justify-center rounded-full bg-blue-600 px-3 text-sm font-medium text-white shadow-md"
+                                v-html="link.label"
+                            ></div>
+
+                            <div
+                                v-else-if="link.url === null"
                                 class="flex h-10 min-w-[2.5rem] items-center justify-center px-3 text-sm text-gray-400"
                                 v-html="link.label"
                             ></div>
+
                             <Link
                                 v-else
                                 :href="link.url"
                                 preserve-scroll
-                                class="flex h-10 min-w-[2.5rem] items-center justify-center rounded-full px-3 text-sm font-medium transition-colors"
-                                :class="
-                                    link.active
-                                        ? 'bg-blue-600 text-white'
-                                        : 'text-gray-600 hover:bg-gray-100'
-                                "
+                                class="flex h-10 min-w-[2.5rem] items-center justify-center rounded-full px-3 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
                                 v-html="link.label"
                             ></Link>
                         </template>
@@ -255,7 +257,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue'; // Jangan lupa tambahkan computed di import
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/components/AppLayout.vue';
 
@@ -271,6 +273,32 @@ const props = defineProps({
 });
 
 const search = ref(props.filters?.search || '');
+
+// Computed Property Pagination (Sama persis dengan yang di Pengumuman)
+const paginationLinks = computed(() => {
+    const links = props.articles?.meta?.links || props.articles?.links || [];
+
+    return links.map((link) => {
+        let cleanLabel = String(link.label || '');
+
+        if (
+            cleanLabel.includes('pagination.previous') ||
+            cleanLabel.includes('Previous')
+        ) {
+            cleanLabel = '&laquo;';
+        } else if (
+            cleanLabel.includes('pagination.next') ||
+            cleanLabel.includes('Next')
+        ) {
+            cleanLabel = '&raquo;';
+        }
+
+        return {
+            ...link,
+            label: cleanLabel,
+        };
+    });
+});
 
 const handleSearch = () => {
     router.get(
