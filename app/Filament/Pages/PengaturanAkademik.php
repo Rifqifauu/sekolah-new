@@ -18,6 +18,10 @@ class PengaturanAkademik extends Page
     protected static ?string $title = 'Pengaturan Akademik';
     protected string $view = 'filament.pages.pengaturan-akademik';
 
+    public static function canAccess(): bool
+        {
+            return auth()->user()?->is_admin === true;
+        }
     public function content(Schema $schema): Schema
     {
         return $schema->components([

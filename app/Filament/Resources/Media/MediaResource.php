@@ -22,7 +22,10 @@ class MediaResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCamera;
     protected static string | UnitEnum | null $navigationGroup = 'Pusat Informasi';
 
-
+    public static function canAccess(): bool
+        {
+            return auth()->user()?->is_admin === true;
+        }
     public static function form(Schema $schema): Schema
     {
         return MediaForm::configure($schema);

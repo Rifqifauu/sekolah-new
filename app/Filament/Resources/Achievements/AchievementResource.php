@@ -26,7 +26,10 @@ class AchievementResource extends Resource
     protected static string | UnitEnum | null $navigationGroup = 'Akademik';
 
 
-
+    public static function canAccess(): bool
+        {
+            return auth()->user()?->is_admin === true;
+        }
 
     public static function form(Schema $schema): Schema
     {

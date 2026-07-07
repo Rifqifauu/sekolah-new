@@ -58,7 +58,7 @@
                         class="mt-10 grid grid-cols-3 gap-4 border-y border-slate-200 py-6 text-center lg:gap-8 lg:divide-x lg:divide-slate-200 lg:text-left"
                     >
                         <div class="lg:pr-4">
-                            <p class="text-3xl font-bold text-blue-700">A</p>
+                            <p class="text-3xl font-bold text-blue-700">B</p>
                             <p class="mt-1 text-sm font-medium text-slate-500">
                                 Akreditasi
                             </p>

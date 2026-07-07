@@ -38,7 +38,10 @@ class WebsiteSettings extends Page implements HasForms
         // Isi form dengan data yang sudah dikelompokkan berdasarkan key-nya masing-masing
         $this->form->fill($settings);
     }
-
+    public static function canAccess(): bool
+        {
+            return auth()->user()?->is_admin === true;
+        }
     /**
      * Konfigurasi form murni menggunakan metode ->components() milik v5
      */

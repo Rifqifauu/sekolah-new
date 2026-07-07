@@ -40,7 +40,11 @@ class AttendanceResource extends Resource
             //
         ];
     }
-
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+        return ($user?->is_admin === true) || ($user?->people?->role === 'teacher');
+    }
     public static function getPages(): array
     {
         return [

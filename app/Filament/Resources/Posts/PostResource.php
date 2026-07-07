@@ -23,6 +23,10 @@ class PostResource extends Resource
      protected static ?string $modelLabel = 'Pengumuman dan Berita';
      protected static string | UnitEnum | null $navigationGroup = 'Pusat Informasi';
 
+     public static function canAccess(): bool
+         {
+             return auth()->user()?->is_admin === true;
+         }
     public static function form(Schema $schema): Schema
     {
         return PostForm::configure($schema);

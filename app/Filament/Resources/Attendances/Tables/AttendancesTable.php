@@ -11,6 +11,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\DatePicker;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Textarea;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -139,22 +140,23 @@ class AttendancesTable
                     })
             ])
             ->headerActions([
-                \Filament\Actions\Action::make('generateAttendances')
-                    ->label('Generate Kehadiran')
-                    ->icon('heroicon-o-sparkles')
-                    ->color('primary')
-                    ->form([
-                        DatePicker::make('date')
-                            ->label('Tanggal')
-                            ->default(now())
-                            ->required(),
+                            \Filament\Actions\Action::make('generateAttendances')
+                                ->label('Generate Kehadiran')
+                                ->icon('heroicon-o-sparkles')
+                                ->color('primary')
+                                ->form([
+                                    DatePicker::make('date')
+                                        ->label('Tanggal')
+                                        ->default(now())
+                                        ->required(),
 
-                        Select::make('classroom_id')
-                            ->label('Kelas')
-                            ->options(Classroom::pluck('name', 'id'))
-                            ->required()
-                            ->default(fn (Component $livewire) => ($livewire->activeTab && $livewire->activeTab !== 'all') ? $livewire->activeTab : null),
-                    ])
+                                        Hidden::make('classroom_id')
+                                            ->default(function (Component $livewire) {
+                                                $activeTab = $livewire->activeTab;
+                                                return \App\Models\Classroom::where('name', $activeTab)->value('id');
+                                            })
+                                            ->required(),
+                                ])
                     ->action(function (array $data): void {
                         $classroomId = $data['classroom_id'];
                         $activePeriod = AcademicPeriod::where('is_active', true)->first();

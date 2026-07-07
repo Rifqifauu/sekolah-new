@@ -29,7 +29,10 @@ class FacilityResource extends Resource
     {
         return FacilityForm::configure($schema);
     }
-
+    public static function canAccess(): bool
+        {
+            return auth()->user()?->is_admin === true;
+        }
     public static function table(Table $table): Table
     {
         return FacilitiesTable::configure($table);

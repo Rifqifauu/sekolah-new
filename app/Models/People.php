@@ -5,11 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\User;
 
 class People extends Model
 {
-    protected $fillable = ['name', 'email', 'phone', 'id_number', 'role', 'classroom_id','gender','position','image'];
+    protected $fillable = ['user_id','name', 'email', 'phone', 'id_number', 'role', 'classroom_id','gender','position','image'];
     protected $table = 'people';
+
+    public function user(): BelongsTo
+        {
+            return $this->belongsTo(User::class, 'user_id');
+        }
 
     public function classroom(): BelongsTo
     {

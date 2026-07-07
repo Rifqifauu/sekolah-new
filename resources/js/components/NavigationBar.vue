@@ -255,10 +255,7 @@ const menuItems = [
     {
         label: 'Tentang Kami',
         href: '#',
-        subItems: [
-            { label: 'Sejarah Sekolah', href: '/profil/sejarah' },
-            { label: 'Visi & Misi', href: '/profil/visi-misi' },
-        ],
+        subItems: [{ label: 'Visi & Misi', href: '/profil/visi-misi' }],
     },
     {
         label: 'Kepegawaian',

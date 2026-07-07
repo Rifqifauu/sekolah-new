@@ -28,6 +28,10 @@ class ExtracurricularResource extends Resource
     {
         return ExtracurricularForm::configure($schema);
     }
+    public static function canAccess(): bool
+        {
+            return auth()->user()?->is_admin === true;
+        }
 
     public static function table(Table $table): Table
     {
