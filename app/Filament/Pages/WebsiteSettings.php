@@ -38,10 +38,12 @@ class WebsiteSettings extends Page implements HasForms
         // Isi form dengan data yang sudah dikelompokkan berdasarkan key-nya masing-masing
         $this->form->fill($settings);
     }
+
     public static function canAccess(): bool
-        {
-            return auth()->user()?->is_admin === true;
-        }
+    {
+        return auth()->user()?->is_admin === true;
+    }
+
     /**
      * Konfigurasi form murni menggunakan metode ->components() milik v5
      */
@@ -71,6 +73,7 @@ class WebsiteSettings extends Page implements HasForms
                                     FileUpload::make('school_logo')
                                         ->label('Logo Sekolah')
                                         ->image()
+                                        ->disk('public')
                                         ->directory('site-identity')
                                         ->helperText('Format PNG transparan direkomendasikan.'),
                                 ]),
@@ -89,6 +92,7 @@ class WebsiteSettings extends Page implements HasForms
                                     FileUpload::make('hero_images')
                                         ->label('Hero Images (Maksimal 3 Gambar)')
                                         ->image()
+                                        ->disk('public')
                                         ->multiple()
                                         ->maxFiles(3)
                                         ->directory('site-hero')
@@ -108,6 +112,7 @@ class WebsiteSettings extends Page implements HasForms
                                     FileUpload::make('kepsek_image')
                                         ->label('Foto Kepala Sekolah')
                                         ->image()
+                                        ->disk('public')
                                         ->directory('site-profil'),
                                 ]),
 
@@ -137,6 +142,7 @@ class WebsiteSettings extends Page implements HasForms
                                     FileUpload::make('history_image')
                                         ->label('Foto/Gambar Sejarah')
                                         ->image()
+                                        ->disk('public')
                                         ->directory('site-sejarah')
                                         ->columnSpan(1),
                                 ]),
